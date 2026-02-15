@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HNS Events · conference registration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f7fb;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    /* main card – clean, light, like screenshot style */
+    .card {
+      max-width: 460px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px -12px rgba(0,0,0,0.12), 0 6px 18px rgba(0,0,0,0.05);
+      padding: 2rem 2rem 2rem 2rem;
+      transition: 0.2s;
+      position: relative;
+    }
+
+    /* thank you overlay (hidden by default) */
+    .thankyou-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s;
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    .thankyou-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .thankyou-icon {
+      background: #10b981;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.8rem;
+      color: white;
+      font-size: 2rem;
+      font-weight: 400;
+    }
+
+    .thankyou-title {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      color: #111827;
+    }
+
+    .thankyou-message {
+      font-size: 1.1rem;
+      color: #4b5563;
+      margin-bottom: 2rem;
+      max-width: 280px;
+    }
+
+    .auto-return {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      border-top: 1px solid #edf2f7;
+      padding-top: 1.5rem;
+      width: 100%;
+    }
+
+    /* secure dot + heading */
+    .secure-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: #4b5563;
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.3px;
+    }
+    .green-dot {
+      height: 8px;
+      width: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #111827;
+      margin-bottom: 0.25rem;
+    }
+
+    .subhead {
+      font-size: 0.95rem;
+      color: #4b5563;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+    }
+
+    /* form labels */
+    label {
+      font-size: 0.8rem;
+      font-weight: 550;
+      color: #1f2937;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      background: #ffffff;
+      transition: 0.15s;
+      margin-bottom: 1.4rem;
+    }
+    .input-wrapper:focus-within {
+      border-color: #9ca3af;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.02);
+    }
+
+    .input-icon {
+      padding: 0 0 0 16px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      font-size: 1rem;
+    }
+
+    .input-field {
+      width: 100%;
+      border: none;
+      padding: 0.9rem 16px 0.9rem 8px;
+      font-size: 0.95rem;
+      background: transparent;
+      border-radius: 16px;
+      outline: none;
+      color: #111827;
+    }
+    .input-field::placeholder {
+      color: #9ca3af;
+      font-weight: 300;
+    }
+
+    /* register button */
+    .btn-register {
+      width: 100%;
+      background: #111827;
+      color: white;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+      margin: 1rem 0 1.2rem 0;
+    }
+    .btn-register:hover {
+      background: #2d3748;
+    }
+
+    .btn-register svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      color: #9ca3af;
+      font-size: 0.8rem;
+      margin: 1rem 0 1rem;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+    .divider-text {
+      padding: 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    
+    .btn-github:hover {
+      background: #f9fafb;
+    }
+
+    .btn-github svg {
+      height: 18px;
+      width: 18px;
+      fill: #1f2937;
+    }
+
+    /* footer (simple) */
+    .footer-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #6b7280;
+      border-top: 1px solid #edf2f7;
+      padding-top: 1.2rem;
+      margin-top: 0.2rem;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      color: #374151;
+      margin-left: 1rem;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    .hns-brand {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="formCard">
+    <!-- THANK YOU OVERLAY (hidden initially) -->
+    <div class="thankyou-overlay" id="thankyouOverlay">
+      <div class="thankyou-icon">✓</div>
+      <div class="thankyou-title">Welcome!</div>
+      <div class="thankyou-message">Thank you for registering for HNS Events.<br>See you at the conference.</div>
+      <div class="auto-return">Returning to form in <span id="countdownSec">30</span>s</div>
+    </div>
+
+    <!-- MAIN REGISTRATION FORM -->
+    <div id="formContent">
+      <!-- Secure area dot + text (exactly as screenshot style) -->
+      <div class="secure-tag">
+        <span class="green-dot"></span>
+        <span>HNS EVENTS</span>
+      </div>
+
+      <!-- Heading: conference entry (not sign in) -->
+      <h2>Conference entry</h2>
+      <div class="subhead">
+        Fill in your details to register for HNS Events.
+      </div>
+
+      <!-- REGISTRATION FORM with name, email, phone -->
+      <form id="registrationForm" novalidate>
+        <!-- Full name -->
+        <label for="fullname">Full name</label>
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <input type="text" id="fullname" name="fullname" class="input-field" placeholder="Alex Rivera" required>
+        </div>
+
+        <!-- Email address -->
+        <label for="email">Email</label>
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+          </span>
+          <input type="email" id="email" name="email" class="input-field" placeholder="you@example.com" required>
+        </div>
+
+        <!-- Phone number (new field) -->
+        <label for="phone">Phone number</label>
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12" y2="18" stroke-width="2"></line>
+            </svg>
+          </span>
+          <input type="tel" id="phone" name="phone" class="input-field" placeholder="+1 (555) 123-4567" required>
+        </div>
+
+        <!-- Register button (leads to thank you) -->
+        <button type="submit" class="btn-register" id="registerBtn">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+            <path d="M16 3h5v5" />
+            <path d="m21 3-6 6" />
+          </svg>
+          Register for conference
+        </button>
+      </form>
+
+      <!-- Divider OR (kept for optional provider style, but it's fine) -->
+      <div class="divider">
+        <span class="divider-line"></span>
+        <span class="divider-line"></span>
+      </div>
+
+
+
+      <!-- Footer: exactly like original terms/privacy but without account link (can be adapted) -->
+      <div class="footer-note">
+        <span>HNS Events</span>
+        <div class="footer-links">
+          <a href="#">Terms</a>
+          <span style="color: #d1d5db;">•</span>
+          <a href="#">Privacy</a>
+        </div>
+      </div>
+      <div class="hns-brand">
+        conference registration
+      </div>
+    </div> <!-- end formContent -->
+  </div> <!-- end card -->
+
+  <script>
+    (function() {
+      const form = document.getElementById('registrationForm');
+      const overlay = document.getElementById('thankyouOverlay');
+      const formContent = document.getElementById('formContent');
+      const countdownSpan = document.getElementById('countdownSec');
+
+      let countdownInterval = null;
+      let remainingSeconds = 30;
+
+      // Function to show overlay and hide form
+      function showThankYou() {
+        // Hide main form content (visually, but we use overlay on top)
+        // The overlay is already positioned absolutely inside the card.
+        // We just need to add the 'show' class.
+        overlay.classList.add('show');
+        // Start countdown
+        remainingSeconds = 10;
+        countdownSpan.textContent = remainingSeconds;
+
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = setInterval(function() {
+          remainingSeconds -= 1;
+          countdownSpan.textContent = remainingSeconds;
+
+          if (remainingSeconds <= 0) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            // Hide overlay, show form again
+            overlay.classList.remove('show');
+            // optional: reset form? we keep entries, but better to reset to empty? We'll reset optionally.
+            form.reset();  // clears fields after 10 sec return
+          }
+        }, 1000);
+      }
+
+      // Handle form submit
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();  // no page reload
+
+        // Basic validation: check if fields are filled (HTML5 'required' already used, but double-check)
+        const name = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+
+        if (!name || !email || !phone) {
+          alert('Please fill in all fields.');
+          return;
+        }
+
+        // Simple email regex for better UX (optional)
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+          alert('Enter a valid email address.');
+          return;
+        }
+
+        // Show thank you message with countdown
+        showThankYou();
+      });
+
+      // Edge case: if someone clicks github or other, nothing interferes.
+      // countdown also automatically returns after 30s.
+    })();
+  </script>
+</body>
+</html>
