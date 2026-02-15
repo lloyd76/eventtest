@@ -401,7 +401,23 @@
 
       // Handle form submit
       form.addEventListener('submit', function(e) {
-        e.preventDefault();  // no page reload
+  // basic validation
+  const name = document.getElementById('fullname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+
+  if (!name || !email || !phone) {
+    alert('Please fill in all fields.');
+    e.preventDefault(); // only prevent if invalid
+    return;
+  }
+
+  // show overlay for user experience
+  overlay.classList.add('show');
+
+  // let the form submit normally to Google Script
+});
+
 
         // Basic validation: check if fields are filled (HTML5 'required' already used, but double-check)
         const name = document.getElementById('fullname').value.trim();
